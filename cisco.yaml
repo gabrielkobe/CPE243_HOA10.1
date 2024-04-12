@@ -1,0 +1,51 @@
+---
+
+- hosts: GNS3
+  tasks:
+
+    - name: Configure hostname
+      ios_config:
+        lines:
+          - hostname R1
+      become: yes
+      become_method: enable
+
+    - name: Configure the MOTD
+      ios_banner:
+        banner: motd
+        text: "Unauthorized Access is strictly prohibited."
+      become: yes
+      become_method: enable
+
+    - name: Enable Password Encryption
+      ios_config:
+        lines:
+          - service password-encryption
+      become: yes
+      become_method: enable
+
+    - name: Configure passwords
+      ios_config:
+        lines:
+          - password cisco
+          - login
+        parents:
+          - line vty 0 15
+          - line console 0
+      become: yes
+      become_method: enable
+
+    - name: Enable FastEthernet0/0
+      ios_interfaces:
+        config:
+          - name: FastEthernet0/0
+            description: Configured by Ansible Network
+            enabled: True
+      become: yes
+      become_method: enable
+
+    - name: Save all configurations
+      ios_config:
+        backup: true
+      become: yes
+      become_method: enable
